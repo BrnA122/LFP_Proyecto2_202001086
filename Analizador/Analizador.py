@@ -1,4 +1,7 @@
+from tkinter import messagebox as mb
 from Abstract.lexema import *
+from Analizador.AnalizadorSintactico import Sintactico
+
 
 global n_lin
 global n_col
@@ -7,13 +10,16 @@ global lista_lexemas
 global error_lexemas
 global error_global
 global lista_grafica
-
+global comando_MBD
+global reconocidos
+comando_MBD = []
 tokens_global = []
 error_global = []
 lista_lexemas = []
 error_lexemas= []
+reconocidos = []
 
-caracters = " {()[];,:.}\"=\r"
+caracters = " \r{}"
 
 def armar_comentario(lexema):
     estado = 0
@@ -130,7 +136,9 @@ def armar_variable(lexema):
         return False   
 
 
+
 #--------------Tokens-------------------------
+global comentarios
 tokens ={
     'RCOMENTARIO'        : armar_comentario,
     'RMULTILINEA'        : armar_multilinea,
@@ -146,14 +154,27 @@ tokens ={
     'RSETEAR'            : '$set',
     'RPALABRARESERVADA'  : 'nueva',
     "RATRIBUTO"          : armar_variable,
-    'RIDENTIDICADOR'     : armar_palabra
+    'RIDENTIFICADOR'     : armar_palabra,
+    'DOSPUNTOS'          : ':',
+    'PUNTOYCOMA'         : ';',
+    'COMA'               : ',',
+    'IGUAL'              : '=',
+    'PARENTESIS_IZ'      : '(',
+    'PARENTESIS_DE'      : ')',
+    'COMILLAS'           : "\"",
     }
+
+comando = ['RCREARBD','RELIMINARBD','RCREARCOLECCION','RCREARCOLECCION', 'RELIMINARCOLECCION',
+           'RINSERTAR','RACTUALIZARUNICO','RELIMINARUNICO','RBUSCARTODO','RBUSCARUNICO']
+
+#signos = ['PUNTOYCOMA', 'IGUAL', 'PAREN_IZ', 'PAREN_DE','COMILLA']
+
 comentarios = ["RCOMENTARIO","RMULTILINEA"]
 
 def instruccion(cadena):
+    global reconocidos
     n_lin , n_col = 1, 0
     puntero = 0
-    reconocidos = []
     error = False
     
     while puntero < len(cadena):
@@ -179,7 +200,7 @@ def instruccion(cadena):
                 
                 if lexema == patron:
                     reconocido = True
-                    #reconocidos.append((token,lexema,n_lin ,n_col))
+                    reconocidos.append((token,lexema,n_lin ,n_col))
                     l = Lexema(token, lexema, n_lin , n_col)
                     lista_lexemas.append(l)
                     puntero += len(patron)
@@ -214,7 +235,7 @@ def instruccion(cadena):
                         n_col += indice_adelante - puntero -1
 
                     lexema = lexema.replace("\n","\\n ")
-                    #reconocidos.append((token,lexema,n_lin ,n_col))
+                    reconocidos.append((token,lexema,n_lin ,n_col))
                     l = Lexema(token, lexema, n_lin , n_col)
                     lista_lexemas.append(l)
                     puntero = indice_adelante - 1
@@ -228,8 +249,5 @@ def instruccion(cadena):
                 err = Lexema("Error Lexico", lexema, n_lin, n_col)
                 error_lexemas.append(err)
             error = True
-
-    return lista_lexemas, error_lexemas
-
-        
     
+    return lista_lexemas, error_lexemas, reconocidos

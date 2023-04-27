@@ -15,6 +15,8 @@ class Inicio():
         alto_ventana = 658
         x_ventana = self.ventana.winfo_screenwidth() 
         y_ventana = self.ventana.winfo_screenheight() 
+        global analizador_sintac
+        analizador_sintac = Sintactico()
 
         pwidth = round(x_ventana/2-ancho_ventana/2)
         pheight = round(y_ventana/2-alto_ventana/2-45)
@@ -66,7 +68,7 @@ class Inicio():
         self.ventana, text="Fila: 0 Columna: 0", anchor="w")
         self.position_label.place(x=0, y= 638, height=20, width=250)
 
-        button_Analizar = Button(self.ventana, text="Analizar", command =lambda: Analizar(self.txtArea, self.txtArea2)).place(x = 50, y=80, width=200, height=35)
+        button_Analizar = Button(self.ventana, text="Analizar", command =lambda: self.Analizar()).place(x = 50, y=80, width=200, height=35)
         button_Tokens = Button(self.ventana, text="Ver Tokens", command =verTokens).place(x = 250, y=80, width=200, height=35)
         button_Errores = Button(self.ventana, text="Ver Errores", command =verErrores).place(x = 450, y=80, width=200, height=35)
 
@@ -99,21 +101,31 @@ class Inicio():
                                     'Nombre:\n\tBrian Estuardo Ajuchán Tococh\n\nCarné:\n\t202001086\n'
                                     'Curso:\n\t Lab. Lenguajes Formales y de Programación')
 
-def Analizar(area_texto, area_salida):
-    global tokens_global
-    global error_global
-    analizar = str(area_texto.get(1.0, END))
-    tkns, error = instruccion(analizar)
-    if len(error_lexemas)>0:
-        mb.showerror("ERROR", "Se encontro uno o mas errores en el archivo de entrada")
-        for res in error_lexemas:
-            respuesta = (res.getTipo()+": " + str(res.getLexema())+" Fila: "+str(res.getFila())+" Columna: "+str(res.getColumna())+"\n")
-            area_salida.insert(END,respuesta)
+    def Analizar(self):
+        global tokens_global
+        global error_global
+        
+        analizar = str(self.txtArea.get(1.0, END))
+        tkns, error, reconocido = instruccion(analizar)
+        if len(error_lexemas)>0:
+            mb.showerror("ERROR", "Se encontro uno o mas errores en el archivo de entrada")
+            for res in error_lexemas:
+                respuesta = (res.getTipo()+": " + str(res.getLexema())+" Fila: "+str(res.getFila())+" Columna: "+str(res.getColumna())+"\n")
+                self.txtArea2.insert(END,respuesta)
+                tokens_global = tkns
+                error_global = error
+        else:
+            mb.showinfo("Información", "Analisis Completo")
             tokens_global = tkns
-            error_global = error
-    else:
-        mb.showinfo("Información", "Continuando con el Analisis Sintactico.")
-        tokens_global = tkns
+            salida = analizador_sintac.analizar(reconocido)
+            for res in salida:
+                texto = str(res)+"\n"
+                self.txtArea2.insert(END, texto)
+
+        
+    
+        #for ask in error_sin:
+        #    print(ask)
     #tokens_global = tkns
 
 def verTokens():
@@ -136,11 +148,11 @@ def verTokens():
     
     columnas = ("num","token","lexema","fila","col")
     tabla = ttk.Treeview(ventana, columns=columnas, show="headings")
-    tabla.column("num", stretch=False, width=125)
+    tabla.column("num", stretch=False, width=35)
     tabla.heading('num', text='No.')
-    tabla.column("token", stretch=False, width=125)
+    tabla.column("token", stretch=False, width=175)
     tabla.heading('token', text='Token')
-    tabla.column("lexema", stretch=False, width=125)
+    tabla.column("lexema", stretch=False, width=165)
     tabla.heading('lexema', text='Lexema')
     tabla.column("fila", stretch=False, width=125)
     tabla.heading('fila', text='Fila')
