@@ -1,25 +1,16 @@
 from tkinter import messagebox as mb
 from Abstract.lexema import *
-from Analizador.AnalizadorSintactico import Sintactico
 
-
-global n_lin
-global n_col
-global instrucciones
 global lista_lexemas
 global error_lexemas
-global error_global
-global lista_grafica
-global comando_MBD
 global reconocidos
-comando_MBD = []
+
 tokens_global = []
-error_global = []
 lista_lexemas = []
 error_lexemas= []
 reconocidos = []
 
-caracters = " \r{}"
+caracters = " \r"
 
 def armar_comentario(lexema):
     estado = 0
@@ -133,8 +124,49 @@ def armar_variable(lexema):
     if estado in valido:
         return True
     else:
-        return False   
+        return False  
 
+def armar_json(lexema):
+    estado = 0
+    valido = [4]
+
+    for char in lexema:   
+        if estado == 0:
+            if char == "\"":
+                estado = 1
+            else:
+                estado = -5
+        elif estado == 1:
+            if char == "{":
+                estado = 2
+            else:
+                estado = -5
+        elif estado == 2:
+            if char == "}":
+                estado = 3
+            elif char == "\n" or char != "\n":
+                estado = 2
+            else:
+                estado = -5
+        elif estado == 3:
+            if char == "}":
+                estado = 4
+            elif char == "\"" :
+                estado = 4
+            else:
+                estado = -5
+        elif estado == 4:
+            if char == "}":
+                estado = -5
+            elif char == "\"":
+                estado = 4
+            else:
+                estado = -5
+
+    if estado in valido:
+        return True
+    else:
+        return False
 
 
 #--------------Tokens-------------------------
@@ -155,24 +187,24 @@ tokens ={
     'RPALABRARESERVADA'  : 'nueva',
     "RATRIBUTO"          : armar_variable,
     'RIDENTIFICADOR'     : armar_palabra,
+    'RJSON'              : armar_json,
     'DOSPUNTOS'          : ':',
     'PUNTOYCOMA'         : ';',
     'COMA'               : ',',
     'IGUAL'              : '=',
     'PARENTESIS_IZ'      : '(',
     'PARENTESIS_DE'      : ')',
-    'COMILLAS'           : "\"",
     }
 
 comando = ['RCREARBD','RELIMINARBD','RCREARCOLECCION','RCREARCOLECCION', 'RELIMINARCOLECCION',
            'RINSERTAR','RACTUALIZARUNICO','RELIMINARUNICO','RBUSCARTODO','RBUSCARUNICO']
 
-#signos = ['PUNTOYCOMA', 'IGUAL', 'PAREN_IZ', 'PAREN_DE','COMILLA']
 
 comentarios = ["RCOMENTARIO","RMULTILINEA"]
 
 def instruccion(cadena):
     global reconocidos
+    global error_lexemas
     n_lin , n_col = 1, 0
     puntero = 0
     error = False
@@ -249,5 +281,5 @@ def instruccion(cadena):
                 err = Lexema("Error Lexico", lexema, n_lin, n_col)
                 error_lexemas.append(err)
             error = True
-    
-    return lista_lexemas, error_lexemas, reconocidos
+            
+    return lista_lexemas, error_lexemas

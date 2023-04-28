@@ -5,6 +5,7 @@ from tkinter import font
 from tkinter import ttk
 from Funciones.cargarArchivo import *
 from Analizador.Analizador import *
+from Analizador.AnalizadorSintactico import *
 
 
 class Inicio():
@@ -104,10 +105,14 @@ class Inicio():
     def Analizar(self):
         global tokens_global
         global error_global
-        
+        reconocidos.clear()
+        lista_lexemas.clear()
+        error_lexemas.clear()
+        tokens_global.clear()
         analizar = str(self.txtArea.get(1.0, END))
-        tkns, error, reconocido = instruccion(analizar)
+        tkns, error = instruccion(analizar)
         if len(error_lexemas)>0:
+            self.txtArea2.delete(1.0, END)
             mb.showerror("ERROR", "Se encontro uno o mas errores en el archivo de entrada")
             for res in error_lexemas:
                 respuesta = (res.getTipo()+": " + str(res.getLexema())+" Fila: "+str(res.getFila())+" Columna: "+str(res.getColumna())+"\n")
@@ -115,14 +120,13 @@ class Inicio():
                 tokens_global = tkns
                 error_global = error
         else:
+            self.txtArea2.delete(1.0, END)
             mb.showinfo("Información", "Analisis Completo")
             tokens_global = tkns
-            salida = analizador_sintac.analizar(reconocido)
-            for res in salida:
-                texto = str(res)+"\n"
-                self.txtArea2.insert(END, texto)
-
-        
+            #salida = analizador_sintac.analizar(reconocidos)
+            #for res in salida:
+            #    texto = str(res)+"\n"
+            #    self.txtArea2.insert(END, texto)
     
         #for ask in error_sin:
         #    print(ask)
