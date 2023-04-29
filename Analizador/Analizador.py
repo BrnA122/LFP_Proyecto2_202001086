@@ -266,7 +266,7 @@ def instruccion(cadena):
                     else:
                         n_col += indice_adelante - puntero -1
 
-                    lexema = lexema.replace("\n","\\n ")
+                    lexema = lexema.replace("\n","\\n")
                     reconocidos.append((token,lexema,n_lin ,n_col))
                     l = Lexema(token, lexema, n_lin , n_col)
                     lista_lexemas.append(l)

@@ -25,10 +25,10 @@ class Sintactico():
                 self.eliminarColeccion()
             elif self.listaToken[self.i][1] == 'InsertarUnico':
                 self.insertarUnico()
-            # elif self.listaToken[self.i][1] == 'ActualizarUnico':
-            #     pass
-            # elif self.listaToken[self.i][1] == 'EliminarUnico':
-            #     pass
+            elif self.listaToken[self.i][1] == 'ActualizarUnico':
+                self.actualizarUnico()
+            elif self.listaToken[self.i][1] == 'EliminarUnico':
+                self.eliminarUnico()
             elif self.listaToken[self.i][1] == 'BuscarTodo':
                 self.buscarTodo()
             elif self.listaToken[self.i][1] == 'BuscarUnico':
@@ -329,43 +329,251 @@ class Sintactico():
                                     self.i += 1
                                     if self.listaToken[self.i][0] == 'COMA':
                                         self.i += 1
-                                        if self.listaToken[self.i][0] == 'COMILLAS':
+                                        if self.listaToken[self.i][0] == 'RJSON':
+                                            archivo = str(self.listaToken[self.i][1]).strip('"').replace('\\n', '\n')
                                             self.i += 1
-                                            if self.listaToken[self.i][0] == 'RATRIBUTO':
-                                                valor1 = str(self.listaToken[self.i][1])
+                                            if self.listaToken[self.i][0] == 'PARENTESIS_DE':
                                                 self.i += 1
-                                                if self.listaToken[self.i][0] == 'DOSPUNTOS':
+                                                if self.listaToken[self.i][0] == 'PUNTOYCOMA':
                                                     self.i += 1
-                                                    if self.listaToken[self.i][0] == 'RATRIBUTO':
-                                                        valor2 = str(self.listaToken[self.i][1])
-                                                        self.i += 1
-                                                        if self.listaToken[self.i][0] == 'COMA':
-                                                            self.i += 1
-                                                            if self.listaToken[self.i][0] == 'RATRIBUTO':
-                                                                valor3 = str(self.listaToken[self.i][1])
-                                                                self.i += 1
-                                                                if self.listaToken[self.i][0] == 'DOSPUNTOS':
-                                                                    self.i += 1
-                                                                    if self.listaToken[self.i][0] == 'RATRIBUTO':
-                                                                        valor4 = str(self.listaToken[self.i][1])
-                                                                        self.i += 1
-                                                                        if self.listaToken[self.i][0] == 'COMILLAS':
-                                                                            self.i += 1
-                                                                            if self.listaToken[self.i][0] == 'PARENTESIS_DE':
-                                                                                self.i += 1
-                                                                                if self.listaToken[self.i][0] == 'PUNTOYCOMA':
-                                                                                    self.i += 1
-                                                                                    json = "{"+str(valor1)+":"+str(valor2)+","+"\n"+str(valor3)+":"+str(valor4)+"}"
-                                                                                    data = f'db.{id_collec}.insertOne({json});'
-                                                                                    self.lista_datas.append(data)
-                                                        else:
-                                                            if self.listaToken[self.i][0] == 'COMILLAS':
-                                                                self.i += 1
-                                                                if self.listaToken[self.i][0] == 'PARENTESIS_DE':
-                                                                    self.i += 1
-                                                                    if self.listaToken[self.i][0] == 'PUNTOYCOMA':
-                                                                        self.i += 1
+                                                    data = f'db.{id_collec}.insertOne({archivo});'
+                                                    self.lista_datas.append(data)
+                                                else:
+                                                    self.i -= 1
+                                                    err_lin = self.listaToken[self.i][2]
+                                                    err_col = self.listaToken[self.i][3]
+                                                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ;")
+                                            else:
+                                                self.i -= 1
+                                                err_lin = self.listaToken[self.i][2]
+                                                err_col = self.listaToken[self.i][3]
+                                                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una )")
+                                        else:
+                                            self.i -= 1
+                                            err_lin = self.listaToken[self.i][2]
+                                            err_col = self.listaToken[self.i][3]
+                                            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una JSON")
+                                    else:
+                                        self.i -= 1
+                                        err_lin = self.listaToken[self.i][2]
+                                        err_col = self.listaToken[self.i][3]
+                                        print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ,")
+                                else:
+                                    self.i -= 1
+                                    err_lin = self.listaToken[self.i][2]
+                                    err_col = self.listaToken[self.i][3]
+                                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una Atributo")
+                            else:
+                                self.i -= 1
+                                err_lin = self.listaToken[self.i][2]
+                                err_col = self.listaToken[self.i][3]
+                                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una (")
+                        else:
+                            self.i -= 1
+                            err_lin = self.listaToken[self.i][2]
+                            err_col = self.listaToken[self.i][3]
+                            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una InsertarUnico")
+                    else:
+                        self.i -= 1
+                        err_lin = self.listaToken[self.i][2]
+                        err_col = self.listaToken[self.i][3]
+                        print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba Palabra Reservada")
+                else:
+                    self.i -= 1
+                    err_lin = self.listaToken[self.i][2]
+                    err_col = self.listaToken[self.i][3]
+                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una Igual")
+            else:
+                self.i -= 1
+                err_lin = self.listaToken[self.i][2]
+                err_col = self.listaToken[self.i][3]
+                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una identificador")
+        else:
+            err_lin = self.listaToken[self.i][2]
+            err_col = self.listaToken[self.i][3]
+            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una InsertarUnico")
 
+    def actualizarUnico(self):
+        data = ''
+        if self.listaToken[self.i][0] == 'RACTUALIZARUNICO':
+            self.i += 1
+            if self.listaToken[self.i][0] == 'RIDENTIFICADOR':
+                self.i += 1
+                if self.listaToken[self.i][0] == 'IGUAL':
+                    self.i += 1
+                    if self.listaToken[self.i][0] == 'RPALABRARESERVADA':
+                        self.i += 1
+                        if self.listaToken[self.i][0] == 'RACTUALIZARUNICO':
+                            self.i += 1
+                            if self.listaToken[self.i][0] == 'PARENTESIS_IZ':
+                                self.i += 1
+                                if self.listaToken[self.i][0] == 'RATRIBUTO':
+                                    id_collec = str(self.listaToken[self.i][1]).replace('\"', '')
+                                    self.i += 1
+                                    if self.listaToken[self.i][0] == 'COMA':
+                                        self.i += 1
+                                        if self.listaToken[self.i][0] == 'RJSON':
+                                            archivo1 = str(self.listaToken[self.i][1]).strip('"').replace('\\n', '\n')
+                                            self.i += 1
+                                            if self.listaToken[self.i][0] == 'COMA':
+                                                self.i += 1
+                                                if self.listaToken[self.i][0] == 'RJSON':
+                                                    archivo2 = str(self.listaToken[self.i][1]).strip('"').replace('\\n', '\n')
+                                                    self.i += 1
+                                                    if self.listaToken[self.i][0] == 'PARENTESIS_DE':
+                                                        self.i += 1
+                                                        if self.listaToken[self.i][0] == 'PUNTOYCOMA':
+                                                            self.i += 1
+                                                            data = f'db.{id_collec}.updateOne({archivo1}, {archivo2});'
+                                                            self.lista_datas.append(data)
+                                                        else:
+                                                            self.i -= 1
+                                                            err_lin = self.listaToken[self.i][2]
+                                                            err_col = self.listaToken[self.i][3]
+                                                            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ;")
+                                                    else:
+                                                        self.i -= 1
+                                                        err_lin = self.listaToken[self.i][2]
+                                                        err_col = self.listaToken[self.i][3]
+                                                        print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una )")
+                                                else:
+                                                    self.i -= 1
+                                                    err_lin = self.listaToken[self.i][2]
+                                                    err_col = self.listaToken[self.i][3]
+                                                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una JSON")
+                                            else:
+                                                self.i -= 1
+                                                err_lin = self.listaToken[self.i][2]
+                                                err_col = self.listaToken[self.i][3]
+                                                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ,")
+                                        else:
+                                            self.i -= 1
+                                            err_lin = self.listaToken[self.i][2]
+                                            err_col = self.listaToken[self.i][3]
+                                            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una JSON")
+                                    else:
+                                        self.i -= 1
+                                        err_lin = self.listaToken[self.i][2]
+                                        err_col = self.listaToken[self.i][3]
+                                        print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ,")
+                                else:
+                                    self.i -= 1
+                                    err_lin = self.listaToken[self.i][2]
+                                    err_col = self.listaToken[self.i][3]
+                                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una Atributo")
+                            else:
+                                self.i -= 1
+                                err_lin = self.listaToken[self.i][2]
+                                err_col = self.listaToken[self.i][3]
+                                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una (")
+                        else:
+                            self.i -= 1
+                            err_lin = self.listaToken[self.i][2]
+                            err_col = self.listaToken[self.i][3]
+                            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ActualizarUnico")
+                    else:
+                        self.i -= 1
+                        err_lin = self.listaToken[self.i][2]
+                        err_col = self.listaToken[self.i][3]
+                        print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba Palabra Reservada")
+                else:
+                    self.i -= 1
+                    err_lin = self.listaToken[self.i][2]
+                    err_col = self.listaToken[self.i][3]
+                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una Igual")
+            else:
+                self.i -= 1
+                err_lin = self.listaToken[self.i][2]
+                err_col = self.listaToken[self.i][3]
+                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una identificador")
+        else:
+            err_lin = self.listaToken[self.i][2]
+            err_col = self.listaToken[self.i][3]
+            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ActualizarUnico")
+
+
+    def eliminarUnico(self):
+        data = ''
+        if self.listaToken[self.i][0] == 'RELIMINARUNICO':
+            self.i += 1
+            if self.listaToken[self.i][0] == 'RIDENTIFICADOR':
+                self.i += 1
+                if self.listaToken[self.i][0] == 'IGUAL':
+                    self.i += 1
+                    if self.listaToken[self.i][0] == 'RPALABRARESERVADA':
+                        self.i += 1
+                        if self.listaToken[self.i][0] == 'RELIMINARUNICO':
+                            self.i += 1
+                            if self.listaToken[self.i][0] == 'PARENTESIS_IZ':
+                                self.i += 1
+                                if self.listaToken[self.i][0] == 'RATRIBUTO':
+                                    id_collec = str(self.listaToken[self.i][1]).replace('\"', '')
+                                    self.i += 1
+                                    if self.listaToken[self.i][0] == 'COMA':
+                                        self.i += 1
+                                        if self.listaToken[self.i][0] == 'RJSON':
+                                            archivo = str(self.listaToken[self.i][1]).strip('"').replace('\\n', '\n')
+                                            self.i += 1
+                                            if self.listaToken[self.i][0] == 'PARENTESIS_DE':
+                                                self.i += 1
+                                                if self.listaToken[self.i][0] == 'PUNTOYCOMA':
+                                                    self.i += 1
+                                                    data = f'db.{id_collec}.deleteOne({archivo});'
+                                                    self.lista_datas.append(data)
+                                                else:
+                                                    self.i -= 1
+                                                    err_lin = self.listaToken[self.i][2]
+                                                    err_col = self.listaToken[self.i][3]
+                                                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ;")
+                                            else:
+                                                self.i -= 1
+                                                err_lin = self.listaToken[self.i][2]
+                                                err_col = self.listaToken[self.i][3]
+                                                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una )")
+                                        else:
+                                            self.i -= 1
+                                            err_lin = self.listaToken[self.i][2]
+                                            err_col = self.listaToken[self.i][3]
+                                            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una JSON")
+                                    else:
+                                        self.i -= 1
+                                        err_lin = self.listaToken[self.i][2]
+                                        err_col = self.listaToken[self.i][3]
+                                        print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ,")
+                                else:
+                                    self.i -= 1
+                                    err_lin = self.listaToken[self.i][2]
+                                    err_col = self.listaToken[self.i][3]
+                                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una Atributo")
+                            else:
+                                self.i -= 1
+                                err_lin = self.listaToken[self.i][2]
+                                err_col = self.listaToken[self.i][3]
+                                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una (")
+                        else:
+                            self.i -= 1
+                            err_lin = self.listaToken[self.i][2]
+                            err_col = self.listaToken[self.i][3]
+                            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una EliminarUnico")
+                    else:
+                        self.i -= 1
+                        err_lin = self.listaToken[self.i][2]
+                        err_col = self.listaToken[self.i][3]
+                        print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba Palabra Reservada")
+                else:
+                    self.i -= 1
+                    err_lin = self.listaToken[self.i][2]
+                    err_col = self.listaToken[self.i][3]
+                    print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una Igual")
+            else:
+                self.i -= 1
+                err_lin = self.listaToken[self.i][2]
+                err_col = self.listaToken[self.i][3]
+                print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una identificador")
+        else:
+            err_lin = self.listaToken[self.i][2]
+            err_col = self.listaToken[self.i][3]
+            print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una EliminarUnico")
             
 
     def buscarTodo(self):

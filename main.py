@@ -123,10 +123,10 @@ class Inicio():
             self.txtArea2.delete(1.0, END)
             mb.showinfo("Información", "Analisis Completo")
             tokens_global = tkns
-            #salida = analizador_sintac.analizar(reconocidos)
-            #for res in salida:
-            #    texto = str(res)+"\n"
-            #    self.txtArea2.insert(END, texto)
+            salida = analizador_sintac.analizar(reconocidos)
+            for res in salida:
+                texto = str(res)+"\n"
+                self.txtArea2.insert(END, texto)
     
         #for ask in error_sin:
         #    print(ask)
