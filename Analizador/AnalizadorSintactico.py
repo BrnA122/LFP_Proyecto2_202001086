@@ -16,6 +16,7 @@ class Sintactico():
 
 
     def analisis_sintactico(self):
+        global comentarios
         while self.i<len(self.listaToken):
             if self.listaToken[self.i][1] == 'CrearBD':
                 self.crearBD()
@@ -35,12 +36,14 @@ class Sintactico():
                 self.buscarTodo()
             elif self.listaToken[self.i][1] == 'BuscarUnico':
                 self.buscarUnico()
+            elif self.listaToken[self.i][0] in comentarios:
+                self.i +=1
             else:
-                # err_lin = self.listaToken[self.i][2]
-                # err_col = self.listaToken[self.i][3]
+                err_lin = self.listaToken[self.i][2]
+                err_col = self.listaToken[self.i][3]
                 self.i+=1
-                # err = Lexema("Error Sintactico", "Se esperaba un Comando", err_lin, err_col)    
-                # self.err_sintac.append(err)
+                err = Lexema("Error Sintactico", "Se esperaba un Comando", err_lin, err_col)    
+                self.err_sintac.append(err)
                 break
         return None
 

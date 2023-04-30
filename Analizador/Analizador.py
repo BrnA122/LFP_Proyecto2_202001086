@@ -4,7 +4,9 @@ from Abstract.lexema import *
 global lista_lexemas
 global error_lexemas
 global reconocidos
+global error_global
 
+error_global = []
 tokens_global = []
 lista_lexemas = []
 error_lexemas= []
@@ -129,7 +131,6 @@ def armar_variable(lexema):
 def armar_json(lexema):
     estado = 0
     valido = [4]
-
     for char in lexema:   
         if estado == 0:
             if char == "\"":
@@ -168,6 +169,44 @@ def armar_json(lexema):
     else:
         return False
 
+def armar_numero(lexema):
+    estado = 0
+    aceptacion = [2,4]
+
+    for char in lexema:
+        if estado == 0:
+            if char.isdigit():
+                estado = 1
+            else:
+                estado = -5
+        elif estado == 1:
+            if char.isdigit():
+                estado = 2
+            else:
+                estado = -5
+        elif estado == 2:
+            if char.isdigit():
+                estado = 2
+            elif char == ".":
+                estado = 3
+            else:
+                estado = -5
+        elif estado == 3:
+            if char.isdigit():
+                estado = 4
+            else:
+                estado = -5
+        elif estado == 4:
+            if char.isdigit():
+                estado = 4
+            else:
+                estado = -5
+
+    if estado in aceptacion:
+        return True
+    else:
+        return False
+
 
 #--------------Tokens-------------------------
 global comentarios
@@ -188,6 +227,7 @@ tokens ={
     'RJSON'              : armar_json,
     'RCOMENTARIO'        : armar_comentario,
     'RMULTILINEA'        : armar_multilinea,
+    'RNUMERO'            : armar_numero,
     'DOSPUNTOS'          : ':',
     'PUNTOYCOMA'         : ';',
     'COMA'               : ',',

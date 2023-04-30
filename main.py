@@ -105,6 +105,7 @@ class Inicio():
     def Analizar(self):
         global tokens_global
         global error_global
+        error_global.clear()
         lista_tokens.clear()
         lista_lexemas.clear()
         error_lexemas.clear()
@@ -129,6 +130,7 @@ class Inicio():
                 for res in err_sintanctico:
                     respuesta = (res.getTipo()+": " + str(res.getLexema())+" Fila: "+str(res.getFila())+" Columna: "+str(res.getColumna())+"\n")
                     self.txtArea2.insert(END,respuesta)
+                    error_global += err_sintanctico
             else:
                 self.txtArea2.delete(1.0, END)
                 mb.showinfo("Información", "Analisis Completo")
