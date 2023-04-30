@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog as fd
+import os
 
 
 def Nuevo(entrada):
@@ -19,6 +20,7 @@ def Nuevo(entrada):
 
 def Abrir(entrada):
     global archivo_abierto
+    
     
     actual = str(entrada.get(1.0, END)).strip()
     
@@ -71,3 +73,13 @@ def GuardarComo(entrada):
     archi1=open(filename, "w", encoding="utf-8")
     archi1.write(guardar)
     archi1.close()
+
+def GuardarResultados(salida):
+    data = ''
+    namefile = os.path.basename(archivo_abierto) 
+
+    for res in salida:
+        data += str(res)+"\n"
+    # Aqui creamos el archivo
+    with open(namefile, 'w', encoding="utf-8") as f:
+        f.write(data)

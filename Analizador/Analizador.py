@@ -8,7 +8,7 @@ global reconocidos
 tokens_global = []
 lista_lexemas = []
 error_lexemas= []
-reconocidos = []
+lista_tokens = []
 
 caracters = " \r"
 
@@ -172,8 +172,6 @@ def armar_json(lexema):
 #--------------Tokens-------------------------
 global comentarios
 tokens ={
-    'RCOMENTARIO'        : armar_comentario,
-    'RMULTILINEA'        : armar_multilinea,
     'RCREARBD'           : 'CrearBD',
     'RELIMINARBD'        : 'EliminarBD',
     'RCREARCOLECCION'    : 'CrearColeccion',
@@ -188,6 +186,8 @@ tokens ={
     "RATRIBUTO"          : armar_variable,
     'RIDENTIFICADOR'     : armar_palabra,
     'RJSON'              : armar_json,
+    'RCOMENTARIO'        : armar_comentario,
+    'RMULTILINEA'        : armar_multilinea,
     'DOSPUNTOS'          : ':',
     'PUNTOYCOMA'         : ';',
     'COMA'               : ',',
@@ -196,23 +196,19 @@ tokens ={
     'PARENTESIS_DE'      : ')',
     }
 
-comando = ['RCREARBD','RELIMINARBD','RCREARCOLECCION','RCREARCOLECCION', 'RELIMINARCOLECCION',
-           'RINSERTAR','RACTUALIZARUNICO','RELIMINARUNICO','RBUSCARTODO','RBUSCARUNICO']
-
-
 comentarios = ["RCOMENTARIO","RMULTILINEA"]
 
 def instruccion(cadena):
-    global reconocidos
+    global lista_tokens
     global error_lexemas
-    n_lin , n_col = 1, 0
+    n_lin = 1
+    n_col = 0
     puntero = 0
     error = False
     
     while puntero < len(cadena):
         char = cadena[puntero]
         reconocido = False
-
         n_col+=1
 
         if char == "\n":
@@ -232,7 +228,7 @@ def instruccion(cadena):
                 
                 if lexema == patron:
                     reconocido = True
-                    reconocidos.append((token,lexema,n_lin ,n_col))
+                    lista_tokens.append((token,lexema,n_lin ,n_col))
                     l = Lexema(token, lexema, n_lin , n_col)
                     lista_lexemas.append(l)
                     puntero += len(patron)
@@ -240,21 +236,21 @@ def instruccion(cadena):
                     break
 
             else:
-                indice_adelante = puntero
-                anterior_reconocido = False
+                siguiente = puntero
+                anterior = False
 
-                while indice_adelante <= len(cadena):
-                    lexema = cadena[puntero : indice_adelante]
+                while siguiente <= len(cadena):
+                    lexema = cadena[puntero : siguiente]
                     reconocido = patron(lexema)
 
-                    if not reconocido and anterior_reconocido:
-                        lexema = cadena[puntero : indice_adelante - 1]
+                    if not reconocido and anterior:
+                        lexema = cadena[puntero : siguiente - 1]
                         reconocido = patron(lexema)
-                        puntero = indice_adelante - 1
+                        puntero = siguiente - 1
                         break  
 
-                    anterior_reconocido = reconocido
-                    indice_adelante += 1
+                    anterior = reconocido
+                    siguiente += 1
 
                 if reconocido:
                     if "\n" in lexema:
@@ -264,13 +260,13 @@ def instruccion(cadena):
                                 n_lin  +=1
                                 n_col = 0
                     else:
-                        n_col += indice_adelante - puntero -1
+                        n_col += siguiente - puntero -1
 
                     lexema = lexema.replace("\n","\\n")
-                    reconocidos.append((token,lexema,n_lin ,n_col))
+                    lista_tokens.append((token,lexema,n_lin ,n_col))
                     l = Lexema(token, lexema, n_lin , n_col)
                     lista_lexemas.append(l)
-                    puntero = indice_adelante - 1
+                    puntero = siguiente - 1
 
             if reconocido: break
 
@@ -281,5 +277,5 @@ def instruccion(cadena):
                 err = Lexema("Error Lexico", lexema, n_lin, n_col)
                 error_lexemas.append(err)
             error = True
-            
+        
     return lista_lexemas, error_lexemas

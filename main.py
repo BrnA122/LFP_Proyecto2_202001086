@@ -105,7 +105,7 @@ class Inicio():
     def Analizar(self):
         global tokens_global
         global error_global
-        reconocidos.clear()
+        lista_tokens.clear()
         lista_lexemas.clear()
         error_lexemas.clear()
         tokens_global.clear()
@@ -121,12 +121,22 @@ class Inicio():
                 error_global = error
         else:
             self.txtArea2.delete(1.0, END)
-            mb.showinfo("Información", "Analisis Completo")
             tokens_global = tkns
-            salida = analizador_sintac.analizar(reconocidos)
-            for res in salida:
-                texto = str(res)+"\n"
-                self.txtArea2.insert(END, texto)
+            salida, err_sintanctico = analizador_sintac.analizar(lista_tokens)
+            if len(err_sintanctico)>0:
+                self.txtArea2.delete(1.0, END)
+                mb.showerror("ERROR", "Se encontro uno o mas errores en el archivo de entrada")
+                for res in err_sintanctico:
+                    respuesta = (res.getTipo()+": " + str(res.getLexema())+" Fila: "+str(res.getFila())+" Columna: "+str(res.getColumna())+"\n")
+                    self.txtArea2.insert(END,respuesta)
+            else:
+                self.txtArea2.delete(1.0, END)
+                mb.showinfo("Información", "Analisis Completo")
+                GuardarResultados(salida)
+                for res in salida:
+                    texto = str(res)+"\n"
+                    self.txtArea2.insert(END, texto)
+
     
         #for ask in error_sin:
         #    print(ask)
