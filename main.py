@@ -111,9 +111,8 @@ class Inicio():
         error_lexemas.clear()
         tokens_global.clear()
         analizar = str(self.txtArea.get(1.0, END))
-        prueba = analizar.replace('\"\n\t{','\"{').replace('\t}\n\");', '}\"\n);').replace('\t},\n\t{', '}\",\n\"{').replace('}\n\t}\n\"', '}}\"').replace('\t}\n\n\"','}\"')
-        print(prueba)
-        tkns, error = instruccion(prueba)
+        analizar_data = analizar.replace('\"\n\t{','\"{').replace('\t}\n\");', '}\"\n);').replace('\t},\n\t{', '}\",\n\"{').replace('}\n\t}\n\"', '}}\"').replace('\t}\n\n\"','}\"')
+        tkns, error = instruccion(analizar_data)
         if len(error_lexemas)>0:
             self.txtArea2.delete(1.0, END)
             mb.showerror("ERROR", "Se encontro uno o mas errores en el archivo de entrada")
