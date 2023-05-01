@@ -52,6 +52,7 @@ class Sintactico():
         if self.listaToken[self.i][0] == 'RCREARBD':
             self.i += 1
             if self.listaToken[self.i][0] == 'RIDENTIFICADOR':
+                id_bd = str(self.listaToken[self.i][1]).replace('\"', '')
                 self.i += 1
                 if self.listaToken[self.i][0] == 'IGUAL':
                     self.i += 1
@@ -61,36 +62,26 @@ class Sintactico():
                             self.i += 1
                             if self.listaToken[self.i][0] == 'PARENTESIS_IZ':
                                 self.i += 1
-                                if self.listaToken[self.i][0] == 'RATRIBUTO':
-                                    id_bd = str(self.listaToken[self.i][1]).replace('\"', '')
+                                if self.listaToken[self.i][0] == 'PARENTESIS_DE':
                                     self.i += 1
-                                    if self.listaToken[self.i][0] == 'PARENTESIS_DE':
+                                    if self.listaToken[self.i][0] == 'PUNTOYCOMA':
                                         self.i += 1
-                                        if self.listaToken[self.i][0] == 'PUNTOYCOMA':
-                                            self.i += 1
-                                            data = f'use(\'{id_bd}\');'
-                                            self.lista_datas.append(data)
-                                        else:
-                                            #self.i -= 1
-                                            err_lin = self.listaToken[self.i][2]
-                                            err_col = self.listaToken[self.i][3]
-                                            err = Lexema("Error Sintactico", "Se esperaba un ;", err_lin, err_col)
-                                            self.err_sintac.append(err)
-                                            #print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ;")
+                                        data = f'use(\'{id_bd}\');'
+                                        self.lista_datas.append(data)
                                     else:
                                         #self.i -= 1
                                         err_lin = self.listaToken[self.i][2]
                                         err_col = self.listaToken[self.i][3]
-                                        err = Lexema("Error Sintactico", "Se esperaba un )", err_lin, err_col)
+                                        err = Lexema("Error Sintactico", "Se esperaba un ;", err_lin, err_col)
                                         self.err_sintac.append(err)
-                                        #print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una )")
+                                        #print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una ;")
                                 else:
                                     #self.i -= 1
                                     err_lin = self.listaToken[self.i][2]
                                     err_col = self.listaToken[self.i][3]
-                                    err = Lexema("Error Sintactico", "Se esperaba un Atributo", err_lin, err_col)
+                                    err = Lexema("Error Sintactico", "Se esperaba un )", err_lin, err_col)
                                     self.err_sintac.append(err)
-                                    #print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una Atributo")
+                                    #print("Error Sintactico", "Linea: ",err_lin, "Columna: ",err_col, "Se esperaba una )")
                             else:
                                 #self.i -= 1
                                 err_lin = self.listaToken[self.i][2]
